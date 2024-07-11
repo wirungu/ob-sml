@@ -1,5 +1,6 @@
 ob-sml
 ====
+EDIT: Temporary fix for this [issue](https://lists.gnu.org/archive/html/emacs-orgmode/2018-11/msg00162.html) I ran into.
 
 Put `ob-sml.el` where it can be loaded by Emacs. For example I place
 it in a directory `~/.emacs.d/vendor` which is automatically put on
