@@ -64,15 +64,23 @@ called by `org-babel-execute-src-block'"
          (vars (org-babel-get:sml processed-params :vars))
          (result-params (org-babel-get:sml processed-params :result-params))
          (result-type (org-babel-get:sml processed-params :result-type))
+         (eval-as-file (cdr (assoc :eval-as-file params)))
          (full-body (org-babel-expand-body:sml
                      body params processed-params))
-         (ob-result (org-babel-comint-with-output (session org-babel-sml-eoe t body)
+          (results
+          (if eval-as-file
+              (let ((tmp-file (org-babel-temp-file "sml-")))
+                (with-temp-file tmp-file (insert body))
+                (org-babel-comint-with-output (session org-babel-sml-eoe t body)
+                  (insert (format "use \"%s\";\n ;\"stdIn\";" tmp-file))
+                  (comint-send-input nil t)))
+            (org-babel-comint-with-output (session org-babel-sml-eoe t body)
                       (mapc
                        (lambda (line)
                          (insert (org-babel-chomp line))
                          (comint-send-input nil t))
-                       (list body "; \"stdIn\";")))))
-    (mapconcat #'identity (butlast ob-result))))
+                       (list body "; \"stdIn\";"))))))
+    (mapconcat #'identity (butlast results))))
 
 (defun org-babel-prep-session:sml (session params)
   "Prepare SESSION according to the header arguments specified in PARAMS."

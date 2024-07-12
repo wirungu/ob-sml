@@ -1,6 +1,42 @@
 ob-sml
 ====
-EDIT: Temporary fix for this [issue](https://lists.gnu.org/archive/html/emacs-orgmode/2018-11/msg00162.html) I ran into.
+EDIT: Temporary fix for this [issue](https://lists.gnu.org/archive/html/emacs-orgmode/2018-11/msg00162.html) I ran into. Also added
+eval-as-file header arg, which loads and compiles the source block as a temp file via `use "tmp";` instead of evaluating line-by-line, so e.g.
+```
+#+BEGIN_SRC sml
+val x = 3;
+val y = x+1;
+val x = 1;
+val w = x;
+#+END_SRC
+```
+yields
+```
+#+RESULTS:
+: val x = 3 : int
+: val y = 4 : int
+: val x = 1 : int
+: val w = 1 : int
+```
+but
+```
+#+BEGIN_SRC sml :eval-as-file t
+val x = 3
+val y = x+1
+val x = 1
+val w = x
+#+END_SRC
+```
+returns
+```
+#+RESULTS:
+: [opening /tmp/babel-A9D27F/sml-xn93nD]
+: val x = <hidden-value> : int
+: val y = 4 : int
+: val x = 1 : int
+: val w = 1 : int
+: val it = () : unit
+```
 
 Put `ob-sml.el` where it can be loaded by Emacs. For example I place
 it in a directory `~/.emacs.d/vendor` which is automatically put on
